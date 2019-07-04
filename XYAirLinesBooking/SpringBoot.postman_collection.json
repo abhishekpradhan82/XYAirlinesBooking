@@ -1,0 +1,132 @@
+{
+	"variables": [],
+	"info": {
+		"name": "SpringBoot",
+		"_postman_id": "48062b2f-eb5b-bb3b-03a9-29cb3f8fcaaf",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BuyTicket",
+			"request": {
+				"url": "localhost:8080/XYAirlines/bookTickets",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tkt\":{\"ticketId\":-1,\"pgr_full_nm\":\"Arpita Pradhan\",\"ticket_price\":1999.5,\"ticket_status\":\"booked\",\"flightId\":100},\"success\":false}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "CancelTickets",
+			"request": {
+				"url": "http://localhost:8080/cancelTicket/700",
+				"method": "PUT",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "FindAvailableFlights",
+			"request": {
+				"url": "http://localhost:8080/XYAirlines/getAvailableFlights",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fromLoc\": \"KOL\",\n    \"toLoc\": \"MUM\",\n    \"dtFrom\": \"2019-07-15T09:00:00.000\",\n    \"dtTo\": \"2019-07-15T18:00:00.000\",\n    \"rangeHr\" : 10\n}"
+				},
+				"description": ""
+			},
+			"response": [
+				{
+					"id": "ca9e4977-cb67-4fcd-9f5c-0504f830e381",
+					"name": "FindAvailableFlights",
+					"originalRequest": {
+						"url": "http://localhost:8080/getAvailableFlights",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fromLoc\": \"KOL\",\n    \"toLoc\": \"MUM\",\n    \"dtFrom\": \"2019-07-04T18:49:58.831\",\n    \"dtTo\": \"2019-07-04T18:49:58.832\"\n}"
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Thu, 04 Jul 2019 13:26:31 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookie": [],
+					"responseTime": 132,
+					"body": "{\"flights\":[{\"flightId\":100,\"flightName\":\"XY100\",\"flightPrice\":1999.5,\"planeid\":2000,\"routeId\":1,\"flightStartDateTime\":\"2019-07-15T07:30:00\",\"flightEndDateTime\":\"2019-07-15T11:00:00\"}]}"
+				}
+			]
+		},
+		{
+			"name": "GetFlightDetails",
+			"request": {
+				"url": "http://localhost:8080/XYAirlines/getFlightDetails/100",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GetAvailableSeatsInflight",
+			"request": {
+				"url": "http://localhost:8080/XYAirlines/getAvailableSeats/100",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

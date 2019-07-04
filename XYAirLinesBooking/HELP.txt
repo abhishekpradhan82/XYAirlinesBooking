@@ -1,0 +1,10 @@
+#XYAirlinesBooking
+
+
+Import SpringBoot.postman_collection.json into Chrome Postman to get the below 5 APIs
+1. FindAvailableFlights
+2. GetFlightDetails
+3. GetAvailableSeatsinFlight
+4. BuyTicket
+5. CancelTicket
+

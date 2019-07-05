@@ -2,8 +2,6 @@ package com.xyairline.booking.model;
 
 import java.util.List;
 
-import com.xyairline.booking.jpa.model.Flight;
-
 public class FlightListModel{
 	
 	private List<Flight> flights;

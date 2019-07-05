@@ -1,14 +1,9 @@
-package com.xyairline.booking.jpa.model;
+package com.xyairline.booking.model;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
 public class Flight {
 	
-	@Id
 	private int flightId;
 	
 	private String flightName;
@@ -19,9 +14,6 @@ public class Flight {
 	private LocalDateTime flightStartDateTime;
 	private LocalDateTime flightEndDateTime;
 	
-	
-	
-
 	public Flight() {
 		super();
 	}

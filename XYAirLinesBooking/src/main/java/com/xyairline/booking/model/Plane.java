@@ -1,19 +1,8 @@
-package com.xyairline.booking.jpa.model;
+package com.xyairline.booking.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "plane")
 public class Plane {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "planeid", updatable = false, nullable = false)
 	private int planeid;
 	
 	private String planeName;

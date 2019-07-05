@@ -2,8 +2,6 @@ package com.xyairline.booking.model;
 
 import java.time.LocalDateTime;
 
-import com.xyairline.booking.jpa.model.Flight;
-
 public class SeatAvailabilityModel {
 	
 	private Flight flt;

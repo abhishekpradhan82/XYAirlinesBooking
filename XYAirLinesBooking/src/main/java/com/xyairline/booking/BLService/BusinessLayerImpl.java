@@ -1,25 +1,30 @@
 package com.xyairline.booking.BLService;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import com.xyairline.booking.exception.TicketException;
-import com.xyairline.booking.jpa.dao.FlightCRUD;
-import com.xyairline.booking.jpa.dao.PlaneCRUD;
 import com.xyairline.booking.jpa.dao.RouteCRUD;
 import com.xyairline.booking.jpa.dao.TicketCRUD;
-import com.xyairline.booking.jpa.model.Flight;
-import com.xyairline.booking.jpa.model.Plane;
 import com.xyairline.booking.jpa.model.Route;
 import com.xyairline.booking.jpa.model.Ticket;
+import com.xyairline.booking.model.Flight;
 import com.xyairline.booking.model.FlightListModel;
+import com.xyairline.booking.model.PlaneModel;
 import com.xyairline.booking.model.SearchFlightModel;
 import com.xyairline.booking.model.SeatAvailabilityModel;
 import com.xyairline.booking.model.TicketModel;
@@ -28,17 +33,27 @@ import com.xyairline.booking.model.TicketModel;
 public class BusinessLayerImpl implements BusinessLayerInterface {
 	
 	
-	@Autowired
-	FlightCRUD flightDao;
+	//@Autowired
+	//FlightCRUD flightDao;
 	
 	@Autowired
 	RouteCRUD routeDao;
 	
-	@Autowired
-	PlaneCRUD planeDao;
+	//@Autowired
+	//PlaneCRUD planeDao;
 	
 	@Autowired
 	TicketCRUD ticketDao;
+	
+	@Autowired
+	RestTemplate XYFlightRest;
+	
+	@Bean
+	@LoadBalanced
+	public RestTemplate getXYFLightRestTemplate()
+	{
+		return new RestTemplate();
+	}
 
 	
 	@Override
@@ -53,8 +68,12 @@ public class BusinessLayerImpl implements BusinessLayerInterface {
 		List<Route> routes= routeDao.getRouteByFromAndTo(fromLoc, toLoc);
 		
 		int rid = routes.get(0).getRouteId();
+	
+		String url = "http://XYFLIGHT/XYAirlines/Flight/getFlightsByRoute/"+rid;
 		
-		List<Flight> flts = flightDao.getFlightsByRoute(rid);
+		ResponseEntity<FlightListModel> fltsModel = XYFlightRest.getForEntity(url, FlightListModel.class);
+		
+		List<Flight> flts = fltsModel.getBody().getFlights();
 		
 		List<Flight> fltsOntheDay = flts.stream()
 			.filter(f->f.getFlightStartDateTime().getDayOfYear()==dtFrom.getDayOfYear())
@@ -72,13 +91,15 @@ public class BusinessLayerImpl implements BusinessLayerInterface {
 	@Override
 	public FlightListModel getFlightDetails(int flid) {
 		
-		FlightListModel fv = new FlightListModel();
+		FlightListModel fv; //= new FlightListModel();
 		
-		Flight fl = flightDao.findById(flid).orElse(new Flight());
+		String url = "http://XYFLIGHT/XYAirlines/Flight/getFlightDetails/"+flid;
+
 		
-		fv.setFlights(Arrays.asList(fl));
+		ResponseEntity<FlightListModel> fltsModel = XYFlightRest.getForEntity(url, FlightListModel.class);
 		
-		// TODO Auto-generated method stub
+		fv = fltsModel.getBody();
+		
 		return fv;
 	}
 
@@ -89,8 +110,11 @@ public class BusinessLayerImpl implements BusinessLayerInterface {
 		
 		SeatAvailabilityModel sam = new  SeatAvailabilityModel();
 		
-		Flight fl = flightDao.findById(flid).orElse(new Flight());
-		Plane p = planeDao.findById(fl.getPlaneid()).orElse(new Plane());
+		Flight fl = callFlightServicebyId(flid);
+
+		
+		PlaneModel p  = callPlaneServicebyId(fl.getPlaneid());
+		
 		int totalSeats = p.getNoOfSeats();
 		int bookedSeats = ticketDao.getBookedSeatCount(flid);
 		
@@ -113,14 +137,38 @@ public class BusinessLayerImpl implements BusinessLayerInterface {
 		return bookTickets(tm);
 		
 	}
+	
+	private Flight callFlightServicebyId(int flid)
+	{
+		String url = "http://XYFLIGHT/XYAirlines/Flight/getFlightDetails/"+flid;
+		ResponseEntity<FlightListModel> fltsModel = XYFlightRest.getForEntity(url, FlightListModel.class);
+		
+		
+		Flight fl = fltsModel.getBody().getFlights().get(0);
+		
+		return fl;
+	}
 
+	private PlaneModel callPlaneServicebyId(int pid)
+	{
+
+		String url = "http://XYFLIGHT/XYAirlines/Flight/getPlaneDetails/"+pid;
+		
+		ResponseEntity<PlaneModel> pmResponse = XYFlightRest.getForEntity(url, PlaneModel.class);
+		
+		//Plane p = planeDao.findById(fl.getPlaneid()).orElse(new Plane());
+		
+		PlaneModel p  = pmResponse.getBody();
+		
+		return p;
+	}
+	
 	@Transactional(propagation = Propagation.MANDATORY)
 	private TicketModel bookTickets(TicketModel tm) throws TicketException
 	{
 		
+		Flight fl = callFlightServicebyId(tm.getTkt().getFlightId());
 		
-		
-		Flight fl = flightDao.findById(tm.getTkt().getFlightId()).orElse(new Flight());
 		Ticket savedTk;
 		TicketModel tmres = new TicketModel();
 		tmres.setSuccess(false);
